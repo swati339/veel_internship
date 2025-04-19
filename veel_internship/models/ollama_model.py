@@ -1,95 +1,57 @@
-import json
+import logging
+# import coloredlogs
+def setup_logging(level='INFO'):
+    """Set up basic colored logging."""
+    logger = logging.getLogger()
+    # coloredlogs.install(level=level, logger=logger, fmt='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+
 import ollama
 from typing import List
 from veel_internship.schemas.pydantic_schema import Responserecipe
-
 
 class OllamaModel:
     def __init__(self, model_name: str = "qwen"):
         self.model_name = model_name
 
-    def structured_output(self, food_name: str, stream: bool = False):
-        """
-        Generates a structured recipe for the given food name using Ollama.
+    def _build_messages(self, food_name: str) -> List[dict]:
+        return [
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that returns recipes in structured JSON format. ",
+            },
+            {
+                "role": "user",
+                "content": f"Generate a recipe for {food_name} and return it in JSON format only. No extra text or emojis.",
+            }
+        ]
 
-        Args:
-            food_name (str): The name of the food to generate a recipe for.
-
-        Returns:
-            Responserecipe: A structured response containing title, ingredients, etc.
-        """
-        # try:
-        #     response = ollama.chat(
-        #         model=self.model_name,
-        #         messages=[
-        #             {
-        #                 "role": "system",
-        #                 "content": "You are a helpful assistant that returns recipes in structured JSON format.",
-        #             },
-        #             {
-        #                 "role": "user",
-        #                 "content": f"Generate a recipe for {food_name} and return it in JSON format:.",
-        #             }
-        #         ],
-        #         stream=True,
-        #         format = Responserecipe.model_json_schema(),
-
-
-
-        #     )
-
-        #     # content = response['message']['content'].strip()
-        #     return response['message']['content'].strip()
-
-        #     # # Ensure it's JSON
-        #     # parsed = json.loads(content)
-        #     # recipe = Responserecipe(**parsed)  # Validate with Pydantic
-        #     # return recipe
-
-        # except json.JSONDecodeError:
-        #     print("The model did not return valid JSON.")
-        # except Exception as e:
-        #     print(f" Error while calling Ollama: {e}")
-        
-        # return None
-
+    def streaming(self, food_name: str) -> str:
+        full_response = ""
         try:
-            if stream == True:
-                full_response = ""
-                for chunk in ollama.chat(
-                    model=self.model_name,
-                    messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a helpful assistant that returns recipes in structured JSON format.",
-                    },
-                    {
-                        "role": "user",
-                        "content": f"Generate a recipe for {food_name} and return it in JSON format:.",
-                    }
-                    ]
-                 
-                ):
-                    part = chunk.get("message", {}).get("content", "")
-                    full_response += part
-                    print(part, end="", flush=True)  
-                return full_response.strip()
+            for chunk in ollama.chat( #for response= ollama.chat, for chunk in resposne
+                
+                model=self.model_name,
+                messages=self._build_messages(food_name),
+                stream=True
+            ):
+                part = chunk.get("message", {}).get("content", "")
+                full_response += part
+                print(part, end="", flush=True)  # Optional: live print while streaming
+        except Exception as e:
+            print(f"Streaming failed: {e}")
+        return full_response.strip()
+
+    def structured_output(self, food_name: str, stream: bool = False) -> str:
+        try:
+            if stream:
+                return self.streaming(food_name)
             else:
                 response = ollama.chat(
                     model=self.model_name,
-                     messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a helpful assistant that returns recipes in structured JSON format.",
-                    },
-                    {
-                        "role": "user",
-                        "content": f"Generate a recipe for {food_name} and return it in JSON format:.",
-                    }
-                ]
+                    messages=self._build_messages(food_name),
+                    stream=False
                 )
                 return response["message"]["content"].strip()
-
         except Exception as e:
             print(f"Error while calling Ollama: {e}")
             return "Error generating response from Ollama."
