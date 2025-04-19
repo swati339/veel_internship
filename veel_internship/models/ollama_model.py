@@ -10,8 +10,9 @@ from typing import List
 from veel_internship.schemas.pydantic_schema import Responserecipe
 
 class OllamaModel:
-    def __init__(self, model_name: str = "qwen"):
+    def __init__(self, model_name: str = "qwen", temperature: float = 0.5):
         self.model_name = model_name
+        self.temp = temperature
 
     def _build_messages(self, food_name: str) -> List[dict]:
         return [
@@ -41,17 +42,15 @@ class OllamaModel:
             print(f"Streaming failed: {e}")
         return full_response.strip()
 
-    def structured_output(self, food_name: str, stream: bool = False) -> str:
+    def structured_output(self, food_name: str) -> str:
         try:
-            if stream:
-                return self.streaming(food_name)
-            else:
-                response = ollama.chat(
-                    model=self.model_name,
-                    messages=self._build_messages(food_name),
-                    stream=False
-                )
-                return response["message"]["content"].strip()
+          
+            response = ollama.chat(
+                model=self.model_name,
+                messages=self._build_messages(food_name),
+                stream=False
+            )
+            return response["message"]["content"].strip()
         except Exception as e:
             print(f"Error while calling Ollama: {e}")
             return "Error generating response from Ollama."
