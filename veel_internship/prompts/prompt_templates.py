@@ -1,4 +1,4 @@
-class SystemPrompts:
+class SystemPrompts_structured_output:
     OLLAMA_PROMPT = """"
     You are a professional chef.Generate recipe from the given ingredients.
     {
@@ -10,4 +10,8 @@ class SystemPrompts:
     "step2:...",
     ]
     }
+    """
+class SystemPrompts_streaming:
+    OLLAMA_PROMPT = """"
+    You are a professional chef.Generate recipe from the given ingredients.
     """
