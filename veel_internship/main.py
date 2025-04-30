@@ -1,5 +1,3 @@
-
-
 import json
 import logging
 
@@ -27,7 +25,7 @@ ollamamodel = OllamaModel(model_name="qwen")
 @app.post("/generate-recipe")
 async def generate_recipe(req: RequestRecipe):
     input_json = req.dict()
-    stream = True  # Set to True to enable streaming response
+    stream = True
 
     if stream:
         logger.info("Streaming mode enabled for recipe generation.")
@@ -37,8 +35,6 @@ async def generate_recipe(req: RequestRecipe):
         logger.info("Structured output mode enabled for recipe generation.")
         response_text = ollamamodel.generate_recipe(input_json)
         logger.info(f"Response Text: {response_text}")
-        
-        
         try:
             parsed = json.loads(response_text)
             return JSONResponse(content=parsed)
@@ -46,32 +42,40 @@ async def generate_recipe(req: RequestRecipe):
             return {"response": response_text}
 
 
-# Gradio
-def gradio_generate_recipe(food_name: str, ingredients: str) -> str:
+# Gradio ChatInterface message handler
+def chat_interface_fn(message, history):
+    food_name = "Chat Request"  
+    ingredients = message
+
     input_json = {
         "food_name": food_name.strip(),
         "ingredients": ingredients.strip()
     }
-    logger.info(f"Gradio input received: {input_json}")
-    response = ollamamodel.generate_recipe(input_json)
-    # return response
+
+    logger.info(f"Gradio Chat input received: {input_json}")
+    response = ollamamodel.generate_recipe(input_json, stream=True)
+
+    accumulated = ""
     for chunk in response:
-        yield chunk
+        accumulated += chunk
+        yield accumulated
 
 
-# Launch Gradio interface (for demo purposes)
+# Launch ChatInterface
 def launch_gradio():
-    demo = gr.Interface(
-        fn=gradio_generate_recipe,
-        inputs=[
-            gr.Textbox(label="Food Name"),
-            gr.Textbox(label="Ingredients (comma-separated)")
-        ],
-        outputs=gr.Textbox(label="Generated Recipe"),
-        title="Recipe Generator with Ollama",
-        description="Enter a food name and ingredients to get a recipe generated using Ollama."
+    chat = gr.ChatInterface(
+        fn=chat_interface_fn,
+        chatbot=gr.Chatbot(),
+        textbox=gr.Textbox(placeholder="Enter ingredients to generate a recipe..."),
+        title="Recipe Chat with Ollama",
+        description="Chat-style recipe generator. Enter ingredients and get a live-generated recipe.",
+        examples=[
+            "tomato, onion, garlic",
+            "chicken, soy sauce, ginger",
+            "paneer, capsicum, turmeric"
+        ]
     )
-    demo.queue().launch()
+    chat.queue().launch()
 
 
 if __name__ == "__main__":
