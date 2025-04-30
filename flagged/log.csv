@@ -1,0 +1,18 @@
+Food Name,Ingredients (comma-separated,Generated Recipe,flag,username,timestamp
+noodles,"noodles, onions",Error generating response from Ollama.,,,2025-04-30 09:46:38.787203
+paneer,"paneer, onions, tomato, spices","'{ 
+   ""food__type"":  ""veg"", 
+   ""food_name"":  ""paneer tikka masala"", 
+   ""ingredients"":  { 
+          ""paneer"" : ""150 g"",
+          ""onions"" : ""2 medium-sized onions, chopped"",
+          ""tomatoes"" : ""2 large tomatoes, peeled and chopped"",
+          ""spices"" : ""2 tablespoons of ground cumin, coriander, black pepper, red chili powder (optional)"", 
+       }, 
+   }, 
+   ""steps"":  [ 
+     ""Heat a pan with oil (around 1 tablespoon per side)."", 
+     ""Add the chopped onions and cook them until they turn golden brown. Keep stirring in between to avoid burning."", 
+     ""After cooking the onions, add the chopped tomatoes into it. Stir well so that the tomato pieces mix evenly with the onions."", 
+     ""Now add the ground spices (cumin, coriander, black pepper, red chili powder (optional))). Stir everything together until all the ingredients are fully mixed. Keep stirring in between to avoid burning."", 
+     ""Now pour some water into the pan and let it simmer for a minute or two so that the flavors of the tomato and onion mixture get fully developed and enhanced with the help of steam. This will also help to reduce any excess moisture present in the food, which can cause the food to become soggy or too wet. This is why it is important to let your food simmer or cook gently for a minute or two so that the flavors of the tomato and onion mixture get fully developed and enhanced with the help of steam. This will also help to reduce any excess moisture present in",,,2025-04-30 10:00:11.153826

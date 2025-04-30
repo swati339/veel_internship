@@ -1,11 +1,12 @@
 class SystemPrompts:
     structured_output_prompt = """
 You are a professional chef. Generate a recipe from the given ingredients.
+Fr
 Return the output in the following JSON format:
 {
   "food_type": "veg or non-veg",
   "food_name": "string",
-  "ingredients": "comma-separated string or list",
+  "ingredients": "dictionary",
   "steps": [
     "step1: ...",
     "step2: ...",
